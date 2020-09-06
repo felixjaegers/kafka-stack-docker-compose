@@ -1,6 +1,5 @@
 [![Build Status](https://travis-ci.org/simplesteph/kafka-stack-docker-compose.svg?branch=master)](https://travis-ci.org/simplesteph/kafka-stack-docker-compose)
 
-
 # kafka-stack-docker-compose
 
 This replicates as well as possible real deployment configurations, where you have your zookeeper servers and kafka servers actually all distinct from each other. This solves all the networking hurdles that comes with Docker and docker-compose, and is compatible cross platform.
@@ -10,15 +9,21 @@ This replicates as well as possible real deployment configurations, where you ha
 ## Stack version
 
   - Zookeeper version: 3.4.9
-  - Kafka version: 2.4.0 (Confluent 5.4.1)
-  - Kafka Schema Registry: Confluent 5.4.1
-  - Kafka Schema Registry UI: 0.9.4
-  - Kafka Rest Proxy: Confluent 5.4.1
+  - Kafka version: 2.5.0 (Confluent 5.5.1)
+  - Kafka Schema Registry: Confluent 5.5.1
+  - Kafka Schema Registry UI: 0.9.5
+  - Kafka Rest Proxy: Confluent 5.5.1
   - Kafka Topics UI: 0.9.4
-  - Kafka Connect: Confluent 5.4.1
-  - Kafka Connect UI: 0.9.4
-  - KSQL Server: Confluent 5.4.1
+  - Kafka Connect: Confluent 5.5.1
+  - Kafka Connect UI: 0.9.7
+  - ksqlDB Server: Confluent 5.5.1
   - Zoonavigator: 0.8.0
+
+
+## Optional: Kafka Desktop Application
+
+Once you have started your cluster, you can use [Conduktor](https://www.conduktor.io/) to easily manage it. 
+Just connect against `localhost:9092` if using Docker, or `192.168.99.100` if using Docker Toolbox
 
 # Requirements
 
@@ -147,10 +152,25 @@ A: yes. Say you want to change `zoo1` port to `12181` (only relevant lines are s
 A: yes. Say you want to change `kafka1` port to `12345` (only relevant lines are shown). Note only `LISTENER_DOCKER_EXTERNAL` changes:
 ```
   kafka1:
-    image: confluentinc/cp-kafka:5.4.1
+    image: confluentinc/cp-kafka:5.5.1
     hostname: kafka1
     ports:
       - "12345:12345"
     environment:
       KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka1:19092,LISTENER_DOCKER_EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:12345
+```
+
+**Q: Kafka is using a lot of disk space for testing. Can I reduce it?**
+
+A: yes. This is for testing only!!! Reduce the KAFKA_LOG_SEGMENT_BYTES to 16MB and the KAFKA_LOG_RETENTION_BYTES to 128MB
+
+```
+  kafka1:
+    image: confluentinc/cp-kafka:5.5.1
+    ...
+    environment:
+      ...
+      # For testing small segments 16MB and retention of 128MB
+      KAFKA_LOG_SEGMENT_BYTES: 16777216
+      KAFKA_LOG_RETENTION_BYTES: 134217728
 ```
